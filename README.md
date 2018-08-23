@@ -4,6 +4,12 @@ Python-style-indented Language
 
 python みたいな indent 付きの自作言語（with bison + yacc）
 
+実装したのは：
+
+- 整数のみ
+- if, if-else 式
+- print で1つ前の式の結果を表示する
+
 ```
 $ make
 
