@@ -25,11 +25,12 @@ static const char* fg      = "\033[0;39m";
 int it = 0;
 %}
 
-%token TOK_INDENT
-%token TOK_DEDENT
+%token TOK_INDENT TOK_DEDENT
 
 %token INTNUM TRUE FALSE
 %token IF THEN ELSE PRINT
+%token TOK_EQ TOK_NE TOK_GE TOK_LE TOK_GT TOK_LT
+%token TOK_PLUS TOK_MINUS TOK_MUL TOK_DIV TOK_L_P TOK_R_P
 
 %%
 root
@@ -43,8 +44,8 @@ statements
 
 statement
     : expr                                  { $$ = $1; }
-    | IF expr THEN codeblock                { if ($2 != 0) $$ = $4; }
-    | IF expr THEN codeblock ELSE codeblock { if ($2 != 0) $$ = $4; else $$ = $6; }
+    | IF cond THEN codeblock                { if ($2 != 0) $$ = $4; }
+    | IF cond THEN codeblock ELSE codeblock { if ($2 != 0) $$ = $4; else $$ = $6; }
     | PRINT                                 { printf(">> %d\n", it); }
     ;
 
@@ -53,9 +54,32 @@ codeblock
     ;
 
 expr
-    : INTNUM
-    | TRUE
-    | FALSE
+    : term                  { $$ = $1; }
+    | expr TOK_PLUS term    { $$ = $1 + $3; }
+    | expr TOK_MINUS term   { $$ = $1 - $3; }
+    ;
+
+term
+    : factor                { $$ = $1; }
+    | term TOK_MUL factor   { $$ = $1 * $3; }
+    | term TOK_DIV factor   { $$ = $1 / $3; }
+    ;
+
+factor
+    : INTNUM                { $$ = $1; }
+    | TOK_L_P expr TOK_R_P  { $$ = $2; }
+    | TRUE                  { $$ = 1; }
+    | FALSE                 { $$ = 0; }
+    ;
+
+cond
+    : expr TOK_EQ expr        { $$ = ($1 == $3); }
+    | expr TOK_NE expr        { $$ = ($1 != $3); }
+    | expr TOK_GE expr        { $$ = ($1 >= $3); }
+    | expr TOK_LE expr        { $$ = ($1 <= $3); }
+    | expr TOK_GT expr        { $$ = ($1 > $3); }
+    | expr TOK_LT expr        { $$ = ($1 < $3); }
+    | expr                    { $$ = $1; }
     ;
 
 indent

@@ -3,6 +3,8 @@
 #include <stack>
 #include <iostream>
 
+// --- indent ---
+
 /* globals to track current indentation */
 int g_current_line_indent = 0;   /* indentation of the current line */
 std::stack<size_t> g_indent_levels;
@@ -43,8 +45,7 @@ void set_yycolumn(int val) {
 %option yylineno
 %option noyywrap
 
-
-TRAIL  [ \t]*
+white       [ \t]*
 
 %%
 
@@ -145,9 +146,22 @@ TRAIL  [ \t]*
 
 <normal>\n  { g_current_line_indent = 0; indent_caller = YY_START; BEGIN(indent); }
 
-if{TRAIL}    { return IF; }
-:{TRAIL}     { return THEN; }
-else:{TRAIL} { return ELSE; }
+if{white}    { return IF; }
+:{white}     { return THEN; }
+else:{white} { return ELSE; }
+
+{white}=={white}   { return TOK_EQ; }
+{white}!={white}   { return TOK_NE; }
+{white}>={white}   { return TOK_GE; }
+{white}<={white}   { return TOK_LE; }
+{white}>{white}    { return TOK_GT; }
+{white}<{white}    { return TOK_LT; }
+{white}\+{white}   { return TOK_PLUS; }
+{white}\-{white}   { return TOK_MINUS; }
+{white}\*{white}   { return TOK_MUL; }
+{white}\/{white}   { return TOK_DIV; }
+{white}\({white}   { return TOK_L_P; }
+{white}\){white}   { return TOK_R_P; }
 
 [0-9]+      {
                 yylval = atoi(yytext);

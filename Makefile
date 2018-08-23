@@ -6,7 +6,7 @@ target=py-style-lang
 
 all: $(target)
 
-$(target): $(target).y
+$(target): $(target).y $(target).lex Makefile
 	@echo "[+] compiling yacc file:" $<
 	@echo "[+] output file:" $@
 	flex -o$@.lex.c $@.lex
