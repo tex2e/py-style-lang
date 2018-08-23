@@ -36,4 +36,4 @@ $ ./bin/py-style-lang tests/test1
 
 TODO:
 
-- print を遅延評価にする（現在は構文解析中に出力されてしまう）
+- if 文の中の print を遅延評価にする（現在は構文解析中に出力されてしまう）
