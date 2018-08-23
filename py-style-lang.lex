@@ -17,7 +17,6 @@ extern const char* g_current_filename;
 
 /* Don't mangle yylex please! */
 #define YY_DECL extern "C" int yylex()
-#define YYSTYPE int
 #include "py-style-lang.tab.h"
 
 #define YY_USER_INIT { \
@@ -150,6 +149,7 @@ if{white}    { return IF; }
 :{white}     { return THEN; }
 else:{white} { return ELSE; }
 
+{white}={white}    { return ASSIGN; }
 {white}=={white}   { return TOK_EQ; }
 {white}!={white}   { return TOK_NE; }
 {white}>={white}   { return TOK_GE; }
@@ -164,14 +164,19 @@ else:{white} { return ELSE; }
 {white}\){white}   { return TOK_R_P; }
 
 [0-9]+      {
-                yylval = atoi(yytext);
+                yylval.int_value = atoi(yytext);
                 return INTNUM;
             }
 
-true        { yylval = 1; return TRUE; }
-false       { yylval = 0; return FALSE; }
+true        { yylval.int_value = 1; return TRUE; }
+false       { yylval.int_value = 0; return FALSE; }
 
 print       { return PRINT; }
+
+[a-zA-Z_]+[0-9a-zA-Z_]  {
+                yylval.string = strdup(yytext);
+                return VAR;
+            }
 
 .           {
                 fprintf(stderr, "%s:%d:%d: Unexpected character: %s",

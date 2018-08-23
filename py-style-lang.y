@@ -20,17 +20,38 @@ static const char* cyan    = "\033[0;36m";
 static const char* white   = "\033[0;37m";
 static const char* fg      = "\033[0;39m";
 
-#define YYSTYPE int
+// --- variables ---
+
+#define VARSIZE 255
+#define VARNAMESIZE 255
+
+typedef struct {
+    char *name;
+    double value;
+} variable;
+
+int var_used = 0;
+variable var[VARSIZE];
+double get_value(char *name);
+int set_value(char *name, double value);
 
 int it = 0;
 %}
 
+%union {
+    int   int_value;
+    char  *string;
+}
+
 %token TOK_INDENT TOK_DEDENT
 
-%token INTNUM TRUE FALSE
-%token IF THEN ELSE PRINT
+%token <int_value> INTNUM TRUE FALSE
+%token <string> VAR
+%token IF THEN ELSE PRINT ASSIGN
 %token TOK_EQ TOK_NE TOK_GE TOK_LE TOK_GT TOK_LT
 %token TOK_PLUS TOK_MINUS TOK_MUL TOK_DIV TOK_L_P TOK_R_P
+
+%type <int_value> statements statement codeblock expr term factor cond
 
 %%
 root
@@ -47,6 +68,7 @@ statement
     | IF cond THEN codeblock                { if ($2 != 0) $$ = $4; }
     | IF cond THEN codeblock ELSE codeblock { if ($2 != 0) $$ = $4; else $$ = $6; }
     | PRINT                                 { printf(">> %d\n", it); }
+    | VAR ASSIGN expr                       { set_value($1, $3); $$ = $3; }
     ;
 
 codeblock
@@ -70,6 +92,7 @@ factor
     | TOK_L_P expr TOK_R_P  { $$ = $2; }
     | TRUE                  { $$ = 1; }
     | FALSE                 { $$ = 0; }
+    | VAR                   { $$ = get_value($1); }
     ;
 
 cond
@@ -103,7 +126,8 @@ dedent
 
 const char* g_current_filename = "stdin";
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     yyin = stdin;
 #if YYDEBUG
     yydebug = 1;
@@ -123,9 +147,39 @@ int main(int argc, char *argv[]) {
     } while (!feof(yyin));
 }
 
-void yyerror(const char *s) {
+void yyerror(const char *s)
+{
     fprintf(stderr, "%s:%d:%d-%d: syntax error: %s\n",
         g_current_filename, yylloc.first_line,
         yylloc.first_column, yylloc.last_column, s);
     exit(-1);
+}
+
+int search_variable(char *name)
+{
+    for ( int i = 0; i < var_used; i++ ) {
+        if ( !strcmp(var[i].name, name) ) { return i; }
+    }
+    return -1;
+}
+
+int set_value(char *name, double value)
+{
+    int i = search_variable(name);
+    if (i == -1) {
+        var[var_used].name = strdup(name);
+        var[var_used].value = value;
+        var_used++;
+    } else {
+        var[i].value = value;
+    }
+    return 0;
+}
+
+double get_value(char *name)
+{
+    int i = search_variable(name);
+    if ( i != -1 ) { return var[i].value; }
+    printf("[-] %s is not definded\n", name);
+    return 0.0;
 }
