@@ -50,8 +50,6 @@ white       [ \t]*
 
     int indent_caller = normal;
 
-#.*\n { REJECT; }
-
  /* This helps to keep track of the column number.
   * Note that it won't work if you have a rule which includes a newline and is
   * longer than one character because in that case that rule will be favored
@@ -60,6 +58,8 @@ white       [ \t]*
   *        yycolumn inside that rule!
   */
 <*>\n       { set_yycolumn(0); yylineno--; REJECT; }
+
+"#"[^\n]*"\n" {}
 
  /* Everything runs in the <normal> mode and enters the <indent> mode
     when a newline symbol is encountered.
@@ -151,20 +151,19 @@ if{white}    { return IF; }
 :{white}     { return THEN; }
 else:{white} { return ELSE; }
 
-{white}={white}    { return ASSIGN; }
-{white}=={white}   { return TOK_EQ; }
-{white}!={white}   { return TOK_NE; }
-{white}>={white}   { return TOK_GE; }
-{white}<={white}   { return TOK_LE; }
-{white}>{white}    { return TOK_GT; }
-{white}<{white}    { return TOK_LT; }
-{white}\+{white}   { return TOK_PLUS; }
-{white}\-{white}   { return TOK_MINUS; }
-{white}\*{white}   { return TOK_MUL; }
-{white}\/{white}   { return TOK_DIV; }
-{white}\({white}   { return TOK_L_P; }
-{white}\){white}   { return TOK_R_P; }
-"\n"             { return LF; }
+{white}"="{white}   { return ASSIGN; }
+{white}"=="{white}  { return TOK_EQ; }
+{white}"!="{white}  { return TOK_NE; }
+{white}">="{white}  { return TOK_GE; }
+{white}"<="{white}  { return TOK_LE; }
+{white}">"{white}   { return TOK_GT; }
+{white}"<"{white}   { return TOK_LT; }
+{white}"+"{white}   { return TOK_PLUS; }
+{white}"-"{white}   { return TOK_MINUS; }
+{white}"*"{white}   { return TOK_MUL; }
+{white}"/"{white}   { return TOK_DIV; }
+{white}"("{white}   { return TOK_L_P; }
+{white}")"{white}   { return TOK_R_P; }
 
 [0-9]+      {
                 yylval.int_value = atoi(yytext);
