@@ -33,3 +33,7 @@ print result
 $ ./bin/py-style-lang tests/test1
 >> 2222
 ```
+
+TODO:
+
+- print を遅延評価にする（現在は構文解析中に出力されてしまう）
