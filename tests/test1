@@ -1,0 +1,10 @@
+
+if true:
+  if false:
+    123
+  else:
+    456
+else:
+  789
+
+print
