@@ -1,26 +1,12 @@
 
-var1 = 2
-var2 = 3
-
-if var1 != var2:
-
-  var3 = 5
-  var4 = 7
-  if var3 >= var4 + 11:
-    1111
+if 2 != 3:
+  if 5 >= 7 + 11:
+    print 1111
   else:
-    var5 = 19
-    if 13 < 17 + var5:
-      2222
+    if 13 < 17 + 19:
+      print 2222
     else:
-      3333
+      print 3333
 
 else:
-  4444
-
-print
-
-var1
-print
-var5
-print
+  print 4444

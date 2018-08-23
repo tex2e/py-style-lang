@@ -50,6 +50,8 @@ white       [ \t]*
 
     int indent_caller = normal;
 
+#.*\n { REJECT; }
+
  /* This helps to keep track of the column number.
   * Note that it won't work if you have a rule which includes a newline and is
   * longer than one character because in that case that rule will be favored
@@ -162,6 +164,7 @@ else:{white} { return ELSE; }
 {white}\/{white}   { return TOK_DIV; }
 {white}\({white}   { return TOK_L_P; }
 {white}\){white}   { return TOK_R_P; }
+"\n"             { return LF; }
 
 [0-9]+      {
                 yylval.int_value = atoi(yytext);
@@ -171,7 +174,7 @@ else:{white} { return ELSE; }
 true        { yylval.int_value = 1; return TRUE; }
 false       { yylval.int_value = 0; return FALSE; }
 
-print       { return PRINT; }
+print{white} { return PRINT; }
 
 [a-zA-Z_]+[0-9a-zA-Z_]  {
                 yylval.string = strdup(yytext);

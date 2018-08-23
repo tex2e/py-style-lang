@@ -67,8 +67,9 @@ statement
     : expr                                  { $$ = $1; }
     | IF cond THEN codeblock                { if ($2 != 0) $$ = $4; }
     | IF cond THEN codeblock ELSE codeblock { if ($2 != 0) $$ = $4; else $$ = $6; }
-    | PRINT                                 { printf(">> %d\n", it); }
+    | PRINT expr                            { printf(">> %d\n", $2); }
     | VAR ASSIGN expr                       { set_value($1, $3); $$ = $3; }
+    | VAR ASSIGN codeblock                  { set_value($1, $3); $$ = $3; }
     ;
 
 codeblock
@@ -157,8 +158,8 @@ void yyerror(const char *s)
 
 int search_variable(char *name)
 {
-    for ( int i = 0; i < var_used; i++ ) {
-        if ( !strcmp(var[i].name, name) ) { return i; }
+    for (int i = 0; i < var_used; i++) {
+        if (!strcmp(var[i].name, name)) { return i; }
     }
     return -1;
 }
@@ -179,7 +180,7 @@ int set_value(char *name, double value)
 double get_value(char *name)
 {
     int i = search_variable(name);
-    if ( i != -1 ) { return var[i].value; }
-    printf("[-] %s is not definded\n", name);
+    if (i != -1) { return var[i].value; }
+    fprintf(stderr, "[-] %s is not definded\n", name);
     return 0.0;
 }
