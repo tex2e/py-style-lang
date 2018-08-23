@@ -7,8 +7,6 @@ target=py-style-lang
 all: $(target)
 
 $(target): $(target).y $(target).lex Makefile
-	@echo "[+] compiling yacc file:" $<
-	@echo "[+] output file:" $@
 	flex -o$@.lex.c $@.lex
 	bison -o$@.tab.c -d $<
 	g++ -w $@.tab.c $@.lex.c -l$(yacclib) -l$(lexlib) -o $(bindir)/$@
