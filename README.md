@@ -2,7 +2,7 @@
 Python-style-indented Language
 ==============================
 
-python みたいな indent 付きの自作言語（with bison + yacc）
+python みたいな indent 付きの自作言語（with bison + flex）
 
 実装したのは：
 
@@ -37,3 +37,10 @@ $ ./bin/py-style-lang tests/test1
 TODO:
 
 - if 文の中の print を遅延評価にする（現在は構文解析中に出力されてしまう）
+
+
+See also
+-----------
+- https://github.com/lucasb-eyer/flex-bison-indentation
+- https://www.gnu.org/software/bison/manual/bison.html
+- http://ipr20.cs.ehime-u.ac.jp/member/kinoshita/exp3/document/flex/flex.html
